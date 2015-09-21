@@ -1,7 +1,10 @@
 package jjegbe01.assignment2;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ListView mainListView;
     ArrayAdapter mArrayAdapter;
     ArrayList mNameList = new ArrayList();
+    android.support.v7.widget.ShareActionProvider mShareActionProvider;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +56,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
+        // Inflate the menu.
+        // Adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Access the Share Item defined in menu XML
+        MenuItem shareItem = menu.findItem(R.id.menu_item_share);
+
+        // Access the object responsible for
+        // putting together the sharing submenu
+        if (shareItem != null) {
+            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        }
+
+        // Create an Intent to share your content
+        setShareIntent();
+
         return true;
+    }
+
+    private void setShareIntent() {
+
+        if (mShareActionProvider != null) {
+
+            // create an Intent with the contents of the TextView
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Android Development");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, mainTextView.getText());
+
+            // Make sure the provider knows
+            // it should work with that Intent
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
     }
 
 
@@ -64,6 +99,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // and use in TextView
         mainTextView.setText(mainEditText.getText().toString()
                 + " is learning Android development!");
+
+        // 6. The text you'd like to share has changed,
+        // and you need to update
+        setShareIntent();
     }
 
     @Override
